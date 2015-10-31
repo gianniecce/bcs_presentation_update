@@ -1,0 +1,35 @@
+---
+title: "bcs anaylsis word tables"
+author: "Giacomo"
+date: "30 Oct 2015"
+output: word_document
+---
+
+```{r,echo=FALSE, message=FALSE, warning=FALSE}
+source('/Users/giacomovagni/Rprojects/analysis_bcs/bcs_stats 2015-10-30-script_presentation.R')
+```
+
+```{r, results='asis', echo=FALSE}
+kable(dta3 %>% group_by(SEX_rec) %>% distinct(pid) %>% summarise(n = n()), caption = "Gender distribution") 
+
+dta3 %>% group_by(SEX_rec, month_rec) %>% distinct(pid) %>% summarise(n = n()) %>% mutate(prop = round( n / sum(n), 2) * 100 )
+
+# dta3 %>% select(pid, SEX_rec, month_rec, maxep) %>% distinct() %>% group_by(pid) %>% mutate(n_max_ep = sum(maxep)) %>% select(SEX_rec, month_rec, n_max_ep) %>% distinct() %>% group_by(SEX_rec, month_rec) %>% mutate(smep = sum(n_max_ep)) %>% select(SEX_rec, month_rec, smep)
+
+# dta3 %>% group_by(SEX_rec, month_rec) %>% distinct(pid) %>% summarise(n = n()) %>% mutate(n = n / sum(n)) %>% df %>% ggplot(aes(month_rec, n, fill = month_rec)) + geom_bar(stat = "identity") + facet_grid(facets=. ~ SEX_rec) + theme_minimal() + ylab('') + scale_fill_manual(values=c('#FB8072', "#56B4E9", "#FDB462")) + theme(axis.line=element_blank(), axis.text.x=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank(), axis.title.x=element_blank()) + guides(fill=guide_legend(title="month"), guide_legend(reverse = TRUE))
+
+#dta3 %>% group_by(SEX_rec) %>% distinct(pid) %>% summarise(n = n()) %>% df %>% ggplot(aes(1, n, fill = SEX_rec)) + geom_bar(stat = "identity") + facet_grid(facets=. ~ SEX_rec) + guides(fill=guide_legend(title="month")) + theme_minimal() + scale_fill_manual(values=c("lightpink", '#F0E442')) + theme(axis.text.x= element_blank(), axis.title.x=element_blank())
+```
+
+```{r, results='asis', echo=FALSE}
+n = n_distinct(dta3$pid)
+dta3Summary = dta3 %>% group_by(diaryday, act_rec) %>% summarise(sdur = sum(duration)) %>% mutate(meanduration = sdur / n) %>% mutate(sum(meanduration))
+# spread( select(dta3Summary, diaryday, act_rec, meanduration), act_rec, meanduration)
+
+dta3SumSpread = df( spread( select(dta3Summary, diaryday, act_rec, meanduration), diaryday, meanduration) )
+tclock = apply(X = dta3SumSpread[,-1], MARGIN = 2, FUN = TimeClock)
+dta3SumSpread = as.data.frame( cbind(Activities = dta3SumSpread[,1], tclock)) 
+
+kable(dta3SumSpread)
+```
+
