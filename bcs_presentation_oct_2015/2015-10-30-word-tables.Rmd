@@ -33,3 +33,9 @@ dta3SumSpread = as.data.frame( cbind(Activities = dta3SumSpread[,1], tclock))
 kable(dta3SumSpread)
 ```
 
+# girls regression 
+
+
+
+
+
